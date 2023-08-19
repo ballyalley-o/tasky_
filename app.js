@@ -11,6 +11,7 @@ let mainWindow
 let tray
 
 app.on(STATE.READY, () => {
+  app.dock.hide()
   mainWindow = new BrowserWindow(MAIN)
   mainWindow.loadURL(`file://${__dirname}/src/index.html`)
   mainWindow.on(EVENTS.BLUR, () => {

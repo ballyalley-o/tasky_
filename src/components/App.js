@@ -1,86 +1,66 @@
-import React, { Component } from "react";
-import { Route, Switch } from "react-router-dom";
+import React, { Component } from 'react'
+import { Route, Switch } from 'react-router-dom'
 
-import Header from "./Header";
-import TasksIndex from "./TasksIndex";
-import TasksShow from "./TasksShow";
-import Timer from "../utils/Timer";
-import Settings from "./Settings";
+import Header from './Header'
+import TasksIndex from './TasksIndex'
+import TasksShow from './TasksShow'
+import Timer from '../utils/Timer'
+import Settings from './Settings'
 
-const APP_DATA = JSON.parse(localStorage.getItem("__INITIAL_STATE__"));
+// constants
+import { INITIAL_STATE } from '../constants'
 
-const INITIAL_STATE = {
-  tasks: [
-    { id: 1, task: "Build App1", totalTime: 10 },
-    { id: 2, task: "Build App2", totalTime: 60 },
-    { id: 3, task: "Build App3", totalTime: 1000 },
-    { id: 4, task: "Build App4", totalTime: 10000 },
-    { id: 5, task: "Build App5", totalTime: 100000 }
-  ],
-  activeTask: null,
-  timer: {
-    active: false,
-    time: 10,
-    unit: "seconds",
-    display: ""
-  }
-};
+const APP_DATA = JSON.parse(localStorage.getItem('__INITIAL_STATE__'))
 
 class App extends Component {
   static defaultProps = {
     updateTrayText: () => {},
-    onTimerExpire: () => {}
-  };
+    onTimerExpire: () => {},
+  }
 
   constructor(props) {
-    super(props);
-    this.state = APP_DATA || INITIAL_STATE;
+    super(props)
+    this.state = APP_DATA || INITIAL_STATE
 
-    this.onAppClose();
+    this.onAppClose()
   }
 
   // --------------------------------------------------
   // -------- electron event handlers -----------------
   // --------------------------------------------------
 
-  onAppClose = () => {
+  onAppClose = () => {}
 
-  };
+  updateTrayText = (title) => {}
 
-  updateTrayText = title => {
-
-  };
-
-  timerHasExpired = () => {
-
-  };
+  timerHasExpired = () => {}
 
   // -------- end of electron event handerls ----------
 
   componentDidMount() {
-    this.initializeTimer();
+    this.initializeTimer()
   }
 
   componentDidUpdate() {
-    localStorage.setItem("__INITIAL_STATE__", JSON.stringify(this.state));
+    localStorage.setItem('__INITIAL_STATE__', JSON.stringify(this.state))
   }
 
   initializeTimer(timerSettings = {}) {
-    const { time, unit } = timerSettings;
+    const { time, unit } = timerSettings
     const timerConfig = {
       duration: time || this.state.timer.time,
       unit: unit || this.state.timer.unit,
       onDisplayChange: this.handleTimerUpdate,
-      onTimerExpiration: this.handleTimerExpiration
-    };
-    this.timer = new Timer(timerConfig);
+      onTimerExpiration: this.handleTimerExpiration,
+    }
+    this.timer = new Timer(timerConfig)
   }
 
   handleTimerUpdate = (newDisplay, reset) => {
-    this.setState(prevState => {
-      const { timer, activeTask } = prevState;
-      const { active } = timer;
-      const updateTaskTime = active && !reset.reset;
+    this.setState((prevState) => {
+      const { timer, activeTask } = prevState
+      const { active } = timer
+      const updateTaskTime = active && !reset.reset
       return {
         timer: { ...timer, display: newDisplay },
 
@@ -88,95 +68,95 @@ class App extends Component {
           ...activeTask,
           totalTime: updateTaskTime
             ? activeTask.totalTime + 1
-            : activeTask.totalTime
-        }
-      };
-    });
+            : activeTask.totalTime,
+        },
+      }
+    })
 
     // handler for electron tray title
-    this.updateTrayText(newDisplay);
-  };
+    this.updateTrayText(newDisplay)
+  }
 
   handleTimerExpiration = () => {
     this.setState({
-      timer: { ...this.state.timer, active: false }
-    });
-    this.timerHasExpired(); // handler for electron Notifications
-  };
+      timer: { ...this.state.timer, active: false },
+    })
+    this.timerHasExpired() // handler for electron Notifications
+  }
 
-  createTask = task => {
+  createTask = (task) => {
     this.setState({
-      tasks: [task, ...this.state.tasks]
-    });
-  };
+      tasks: [task, ...this.state.tasks],
+    })
+  }
 
-  deleteTask = task => {
+  deleteTask = (task) => {
     this.setState({
-      tasks: this.state.tasks.filter(item => item.id !== task.id)
-    });
-  };
+      tasks: this.state.tasks.filter((item) => item.id !== task.id),
+    })
+  }
 
-  handleSettingsUpdate = newSettings => {
-    this.initializeTimer(newSettings);
+  handleSettingsUpdate = (newSettings) => {
+    this.initializeTimer(newSettings)
     this.setState({
       timer: {
         ...this.state.timer,
         ...newSettings,
-        display: this.timer.display
-      }
-    });
-  };
+        display: this.timer.display,
+      },
+    })
+  }
 
   handleDataReset = () => {
-    this.setState({ ...INITIAL_STATE });
-  };
+    this.setState({ ...INITIAL_STATE })
+  }
 
-  handleActivation = task => {
-    this.initializeTimer();
+  handleActivation = (task) => {
+    this.initializeTimer()
     this.setState({
-      tasks: this.state.tasks.filter(item => item.id !== task.id),
+      tasks: this.state.tasks.filter((item) => item.id !== task.id),
       activeTask: task,
       timer: {
         ...this.state.timer,
-        display: this.timer.display
-      }
-    });
-  };
+        display: this.timer.display,
+      },
+    })
+  }
 
-  handleDeactivation = activeTask => {
+  handleDeactivation = (activeTask) => {
     this.setState({
       tasks: [activeTask, ...this.state.tasks],
-      activeTask: null
-    });
-  };
+      activeTask: null,
+    })
+  }
 
   handleTimerStart = () => {
     this.timer.start(() => {
       // sending a callback so there is no delay in rendering start/stop buttons
       this.setState({
-        timer: { ...this.state.timer, active: true }
-      });
-    });
-  };
+        timer: { ...this.state.timer, active: true },
+      })
+    })
+  }
 
   handleTimerStop = () => {
     this.timer.stop(() => {
       this.setState({
-        timer: { ...this.state.timer, active: false }
-      });
-    });
-  };
+        timer: { ...this.state.timer, active: false },
+      })
+    })
+  }
 
   render() {
-    const { tasks, activeTask, timer } = this.state;
+    const { tasks, activeTask, timer } = this.state
     return (
       <div>
         <Header />
-        <div className="container" style={styles.container}>
+        <div className='container' style={styles.container}>
           <Switch>
             <Route
               exact
-              path="/"
+              path='/'
               render={() => (
                 <TasksIndex
                   activeTask={activeTask}
@@ -188,7 +168,7 @@ class App extends Component {
               )}
             />
             <Route
-              path="/tasks"
+              path='/tasks'
               render={() => (
                 <TasksShow
                   tasks={tasks}
@@ -200,7 +180,7 @@ class App extends Component {
               )}
             />
             <Route
-              path="/settings"
+              path='/settings'
               render={() => (
                 <Settings
                   timer={timer}
@@ -212,14 +192,17 @@ class App extends Component {
           </Switch>
         </div>
       </div>
-    );
+    )
   }
 }
 
 const styles = {
   container: {
-    height: "88vh"
-  }
-};
+    height: '88vh',
+    overflowY: 'scroll',
+  },
 
-export default App;
+  backgroundColor: '#f5f5f5',
+}
+
+export default App

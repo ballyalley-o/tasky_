@@ -2,7 +2,7 @@ const electron = require('electron')
 const { app, Tray, Menu } = electron
 const setBounds = require('../src/utils/set-bounds')
 // constants
-const { BRAND } = require('../src/constants')
+const { BRAND, EVENTS } = require('../src/constants')
 const { QUIT } = require('../src/utils/labels-values')
 
 class TaskyTray extends Tray {
@@ -11,8 +11,8 @@ class TaskyTray extends Tray {
 
     this.mainWindow = mainWindow
     this.setToolTip(BRAND.APP_NAME)
-    this.on('click', this.onClick.bind(this))
-    this.on('right-click', this.onRightClick.bind(this))
+    this.on(EVENTS.CLICK, this.onClick.bind(this))
+    this.on(EVENTS.RIGHT_CLICK, this.onRightClick.bind(this))
   }
 
   onClick(event, bounds) {

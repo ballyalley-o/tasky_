@@ -4,6 +4,9 @@ const MAIN = {
   frame: false,
   resizable: false,
   show: false,
+  webPreferences: {
+    backgroundThrottling: false,
+  },
 }
 
 module.exports = MAIN

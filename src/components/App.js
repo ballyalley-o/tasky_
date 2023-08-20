@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { ipcRenderer } from 'electron'
 import { Route, Switch } from 'react-router-dom'
 
 import Header from './Header'
@@ -6,6 +7,8 @@ import TasksIndex from './TasksIndex'
 import TasksShow from './TasksShow'
 import Timer from '../utils/Timer'
 import Settings from './Settings'
+// constants
+import CHANNELS from '../constants/channels-constants'
 
 // constants
 import { INITIAL_STATE } from '../constants'
@@ -31,9 +34,13 @@ class App extends Component {
 
   onAppClose = () => {}
 
-  updateTrayText = (title) => {}
+  updateTrayText = (title) => {
+    ipcRenderer.send(CHANNELS.UPDATE_TIMER, title)
+  }
 
-  timerHasExpired = () => {}
+  timerHasExpired = () => {
+    ipcRenderer.send(CHANNELS.UPDATE_TIMER, '')
+  }
 
   // -------- end of electron event handerls ----------
 

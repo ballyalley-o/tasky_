@@ -3,4 +3,5 @@ module.exports = {
   INITIAL_STATE: require('./mock-constants'),
   BRAND: require('./branding-constants'),
   EVENTS: require('./events-constants'),
+  CHANNELS: require('./channels-constants'),
 }
